@@ -1,8 +1,8 @@
 ARG NOTS_WORKER_VERSION=0.1
-FROM ghcr.io/explodingcamera/nots-worker:${NOTS_WORKER_VERSION} as nots-worker
-
 ARG DEBIAN_VERSION=bookworm
 ARG NODE_VERSION=20
+
+FROM ghcr.io/explodingcamera/nots-worker:${NOTS_WORKER_VERSION} as nots-worker
 FROM node:${DEBIAN_VERSION}-slim
 ARG EXTRA_DEPS=""
 

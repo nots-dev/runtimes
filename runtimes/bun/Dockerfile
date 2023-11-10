@@ -1,12 +1,10 @@
 ARG NOTS_WORKER_VERSION=0.1
-FROM ghcr.io/explodingcamera/nots-worker:${NOTS_WORKER_VERSION} as nots-worker
-
-ARG BUN_VERSION=1.0
-FROM oven/bun:${BUN_VERSION}-distroless as bun
-
 ARG DEBIAN_VERSION=bookworm
-FROM debian:${DEBIAN_VERSION}-slim
+ARG BUN_VERSION=1.0
 
+FROM ghcr.io/explodingcamera/nots-worker:${NOTS_WORKER_VERSION} as nots-worker
+FROM oven/bun:${BUN_VERSION}-distroless as bun
+FROM debian:${DEBIAN_VERSION}-slim
 ARG EXTRA_DEPS=""
 
 COPY --from=bun /usr/local/bin/bun /usr/local/bin/

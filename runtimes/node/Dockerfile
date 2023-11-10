@@ -17,7 +17,7 @@ RUN userdel node \
     && apt-get update && apt-get install -y --no-install-recommends ${EXTRA_DEPS} ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && corepack enable \
-    && corepack install --global pnpm@stable
+    && corepack prepare pnpm@latest --activate
 
 USER noroot
 ARG WORKERD_VERSION

@@ -1,4 +1,8 @@
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  schedule:
+    # Schedule to run at 00:00 every Monday (weekly)
+    - cron: '0 0 * * 1'
 
 name: Build node.js runtime
 

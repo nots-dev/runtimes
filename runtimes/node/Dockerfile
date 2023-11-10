@@ -11,7 +11,8 @@ COPY --from=nots-worker /usr/local/bin/nots-worker /usr/local/bin/
 ENV USERNAME=noroot
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
-RUN groupadd --gid $USER_GID $USERNAME \
+RUN userdel node && groupdel node \
+    && groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME --home-dir /app \
     && apt-get update && apt-get install -y --no-install-recommends ${EXTRA_DEPS} ca-certificates \
     && rm -rf /var/lib/apt/lists/* \

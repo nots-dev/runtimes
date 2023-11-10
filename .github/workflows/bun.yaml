@@ -3,7 +3,7 @@ on: [workflow_dispatch]
 name: Build bun runtime
 
 jobs:
-  build-cli:
+  bun:
     permissions:
       packages: write
     strategy:

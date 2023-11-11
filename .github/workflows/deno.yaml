@@ -46,6 +46,7 @@ jobs:
             nots-worker: 0
             tags: |
               ghcr.io/nots-dev/runtime-deno:latest
+              ghcr.io/nots-dev/runtime-deno:1
               ghcr.io/nots-dev/runtime-deno:${{ needs.matrix-prep.outputs.LATEST_VERSION }}
               ghcr.io/nots-dev/runtime-deno:${{ needs.matrix-prep.outputs.LATEST_VERSION_MAJOR_MINOR }}
           - deno: ${{ needs.matrix-prep.outputs.PREVIOUS_VERSION }}

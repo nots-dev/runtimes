@@ -2,7 +2,6 @@ ARG NOTS_WORKER_VERSION=0.1
 ARG DEBIAN_VERSION=bookworm
 ARG NODE_VERSION=20
 
-# has to start with -, since empty string means latest
 ARG DENO_VERSION=1.38.1
 ARG DENO_IMAGE=denoland/deno:bin-${DENO_VERSION}
 

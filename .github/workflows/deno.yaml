@@ -4,7 +4,7 @@ on:
     # Schedule to run at 00:00 every Monday (weekly)
     - cron: '0 0 * * 1'
 
-name: Build bun runtime
+name: Build deno runtime
 
 jobs:
   matrix-prep:
@@ -35,7 +35,7 @@ jobs:
       PREVIOUS_VERSION: ${{ steps.get-latest-version.outputs.PREVIOUS_VERSION }}
       PREVIOUS_VERSION_MAJOR_MINOR: ${{ steps.get-latest-version.outputs.PREVIOUS_VERSION_MAJOR_MINOR }}
 
-  bun:
+  deno:
     needs: matrix-prep
     permissions:
       packages: write
@@ -75,7 +75,7 @@ jobs:
           push: true
           tags: ${{ matrix.version.tags }}
           platforms: linux/amd64,linux/arm64
-          file: runtimes/bun/Dockerfile
+          file: runtimes/deno/Dockerfile
           build-args: |
             NOTS_WORKER_VERSION=${{ matrix.version.nots-worker }}
-            BUN_VERSION=1.0
+            DENO_VERSION=${{ matrix.version.deno }}

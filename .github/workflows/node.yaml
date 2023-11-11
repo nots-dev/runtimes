@@ -16,13 +16,13 @@ jobs:
           - node: 20
             nots-worker: 0
             tags: |
-              ghcr.io/nots-dev/runtime-node:lts
-              ghcr.io/nots-dev/runtime-node:20
+              ghcr.io/nots-dev/runtime-deno:lts
+              ghcr.io/nots-dev/runtime-deno:20
           - node: 21
             nots-worker: 0
             tags: |
-              ghcr.io/nots-dev/runtime-node:latest
-              ghcr.io/nots-dev/runtime-node:21
+              ghcr.io/nots-dev/runtime-deno:latest
+              ghcr.io/nots-dev/runtime-deno:21
 
     runs-on: ubuntu-22.04
     steps:

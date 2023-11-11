@@ -1,0 +1,80 @@
+on:
+  workflow_dispatch:
+  schedule:
+    # Schedule to run at 00:00 every Monday (weekly)
+    - cron: '0 0 * * 1'
+
+name: Build bun runtime
+
+jobs:
+  matrix-prep:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Get latest Deno version
+        id: get-latest-version
+        run: |
+          # Fetch all version tags
+          VERSIONS=$(curl -s https://api.github.com/repos/denoland/deno/tags | jq -r '.[].name' | grep '^v[0-9]\+\.[0-9]\+\.[0-9]\+$')
+          SORTED_VERSIONS=$(echo "$VERSIONS" | sort -rV)
+
+          # Latest version (removing the 'v' prefix)
+          LATEST_VERSION=$(echo "$SORTED_VERSIONS" | head -n 1 | sed 's/^v//')
+          LATEST_VERSION_MAJOR_MINOR=$(echo "$LATEST_VERSION" | grep -oE '[0-9]+\.[0-9]+')
+
+          # Filter out the latest minor version, then get the top version of the previous minor (removing the 'v' prefix)
+          PREVIOUS_VERSION=$(echo "$SORTED_VERSIONS" | grep -v "v$LATEST_VERSION_MAJOR_MINOR" | head -n 1 | sed 's/^v//')
+          PREVIOUS_VERSION_MAJOR_MINOR=$(echo "$PREVIOUS_VERSION" | grep -oE '[0-9]+\.[0-9]+')
+
+          echo "LATEST_VERSION=${LATEST_VERSION}" >> $GITHUB_OUTPUT
+          echo "LATEST_VERSION_MAJOR_MINOR=${LATEST_VERSION_MAJOR_MINOR}" >> $GITHUB_OUTPUT
+          echo "PREVIOUS_VERSION=${PREVIOUS_VERSION}" >> $GITHUB_OUTPUT
+          echo "PREVIOUS_VERSION_MAJOR_MINOR=${PREVIOUS_VERSION_MAJOR_MINOR}" >> $GITHUB_OUTPUT
+    outputs:
+      LATEST_VERSION: ${{ steps.get-latest-version.outputs.LATEST_VERSION }}
+      LATEST_VERSION_MAJOR_MINOR: ${{ steps.get-latest-version.outputs.LATEST_VERSION_MAJOR_MINOR }}
+      PREVIOUS_VERSION: ${{ steps.get-latest-version.outputs.PREVIOUS_VERSION }}
+      PREVIOUS_VERSION_MAJOR_MINOR: ${{ steps.get-latest-version.outputs.PREVIOUS_VERSION_MAJOR_MINOR }}
+
+  bun:
+    needs: matrix-prep
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        version:
+          - deno: ${{ needs.matrix-prep.outputs.LATEST_VERSION }}
+            nots-worker: 0
+            tags: |
+              ghcr.io/nots-dev/runtime-deno:latest
+              ghcr.io/nots-dev/runtime-deno:${{ needs.matrix-prep.outputs.LATEST_VERSION }}
+              ghcr.io/nots-dev/runtime-deno:${{ needs.matrix-prep.outputs.LATEST_VERSION_MAJOR_MINOR }}
+          - deno: ${{ needs.matrix-prep.outputs.PREVIOUS_VERSION }}
+            nots-worker: 0
+            tags: |
+              ghcr.io/nots-dev/runtime-deno:${{ needs.matrix-prep.outputs.PREVIOUS_VERSION }}
+              ghcr.io/nots-dev/runtime-deno:${{ needs.matrix-prep.outputs.PREVIOUS_VERSION_MAJOR_MINOR }}
+
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ matrix.version.tags }}
+          platforms: linux/amd64,linux/arm64
+          file: runtimes/bun/Dockerfile
+          build-args: |
+            NOTS_WORKER_VERSION=${{ matrix.version.nots-worker }}
+            BUN_VERSION=1.0

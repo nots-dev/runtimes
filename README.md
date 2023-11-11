@@ -1,5 +1,8 @@
 # Nots Runtimes
 
+This repository contains the Dockerfiles for the Nots runtimes.
+All supported versions are updated weekly and pushed to the GitHub Container Registry.
+
 ## **`bun`** (`ghcr.io/nots-dev/runtime-bun`)
 
 > The last two minor versions of Bun are supported (currently only 1.0).\
@@ -13,4 +16,4 @@
 ## **`deno`** (`ghcr.io/nots-dev/runtime-deno`)
 
 > The latest version of the last two minor versions of Deno are supported.\
-**tags:** `latest`, `1`, `1.38`, `1.37`, `1.38.1`, `1.37.0`
+**tags:** `latest`, `1`, `1.38`, `1.37`
